@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task 2 — CSS Grid 사진 격자</title>
+  <link rel="stylesheet" href="m3-tokens.css" />
+  <style>
+    :root {
+      /* Mono tone overrides */
+      --md-primary: #424242;
+      --md-on-primary: #ffffff;
+      --md-primary-container: #e0e0e0;
+      --md-on-primary-container: #1a1a1a;
+      --md-secondary-container: #f5f5f5;
+      --md-on-secondary-container: #1a1a1a;
+      --md-tertiary-container: #eeeeee;
+      --md-on-tertiary-container: #1a1a1a;
+      --md-surface-container: #f0f0f0;
+      --md-surface-container-low: #f8f8f8;
+      --md-surface-container-lowest: #ffffff;
+      --md-surface-container-high: #ececec;
+      --md-surface-container-highest: #e6e6e6;
+      --md-on-surface: #1a1a1a;
+      --md-on-surface-variant: #424242;
+      --md-outline: #757575;
+      --md-outline-variant: #bfc7cd;
+      --md-elev-1: none;
+      --md-elev-2: none;
+      --md-elev-3: none;
+    }
+
+    /* Header override */
+    .m3-top-bar {
+      height: 56px;
+    }
+    .m3-top-bar-title {
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    /* Smooth theme transition */
+    html[data-theme] *,
+    html[data-theme] *::before,
+    html[data-theme] *::after {
+      transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        fill 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease,
+        opacity 0.25s ease,
+        width 0.25s ease,
+        filter 0.25s ease;
+    }
+
+    .page-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 24px 40px;
+    }
+
+    /* ═══════════════
+       CSS Grid 3×3
+       ═══════════════ */
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows:    repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    /* M3 Filled Card with image */
+    .photo-card {
+      position: relative;
+      border-radius: var(--md-shape-md);
+      overflow: hidden;
+      aspect-ratio: 1 / 1;
+      background: var(--md-surface-container-highest);
+      box-shadow: none;
+      cursor: pointer;
+      border: 1px solid var(--md-outline-variant);
+    }
+
+    .photo-card:hover {
+      box-shadow: none;
+      transform: scale(1.02);
+      z-index: 2;
+    }
+
+    .photo-card img {
+      width: 100%; height: 100%;
+      object-fit: cover;      display: block;
+      filter: grayscale(100%);
+    }
+
+    .photo-card:hover img { filter: grayscale(0%); }
+
+    /* M3 Scrim */
+    .photo-scrim {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(0,0,0,0.52) 0%,
+        transparent 50%
+      );
+      opacity: 0;
+      display: flex;
+      align-items: flex-end;
+      padding: 12px;
+    }
+
+    .photo-card:hover .photo-scrim { opacity: 1; }
+
+    .photo-label {
+      color: #fff;
+      font: 500 13px/20px Roboto;
+      letter-spacing: 0.1px;
+    }
+
+    .photo-num {
+      position: absolute;
+      top: 8px; left: 8px;
+      background: var(--md-surface-container-highest);
+      color: var(--md-on-surface);
+      font: 700 11px/16px Roboto;
+      letter-spacing: 0.5px;
+      padding: 3px 8px;
+      border-radius: var(--md-shape-sm);
+    }
+
+    /* Interactive Demo Component */
+    .demo-container {
+      width: 100%;
+      border-radius: var(--md-shape-lg);
+      border: 1px solid var(--md-outline-variant);
+      background: var(--md-surface-container-lowest);
+      overflow: hidden;
+      box-shadow: var(--md-elev-1);
+    }
+    .demo-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--md-outline-variant);
+      background: var(--md-surface-container);
+    }
+    .demo-tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: var(--md-on-surface-variant);
+      font: 500 14px/20px Roboto;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .demo-tab.active {
+      color: var(--md-primary);
+      border-bottom-color: var(--md-primary);
+      background: var(--md-surface-container-lowest);
+    }
+    .demo-content {
+      padding: 24px;
+    }
+    .demo-panel {
+      display: none;
+    }
+    .demo-panel.active {
+      display: block;
+      animation: m3-fade-in 0.3s;
+    }
+    .demo-panel h3 {
+      font: 500 16px/24px Roboto;
+      letter-spacing: 0.15px;
+      color: var(--md-on-surface);
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 560px) {
+      .photo-grid { gap: 6px; }
+    }
+
+    /* Requirement card */
+    .req-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--md-shape-md);
+      border: 1px solid var(--md-outline-variant);
+      overflow: hidden;
+      margin: 0 auto 20px;
+      text-align: left;
+      max-width: 560px;
+      width: 100%;
+    }
+    .req-label {
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+      padding: 10px 16px;
+      font: 500 12px/16px Roboto;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .req-text {
+      background: var(--md-surface-container-lowest);
+      color: var(--md-on-surface);
+      padding: 8px 16px;
+      font: 400 13px/20px Roboto;
+      letter-spacing: 0.25px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .req-text:last-child { border-bottom: none; }
+    /* 첫 번째 req-text = 요구사항 설명 */
+    .req-label + .req-text {
+      font: 400 13px/22px Roboto;
+      padding: 12px 16px;
+      color: var(--md-on-surface);
+    }
+    /* 이후 req-text = 구현 방식 목록 */
+    .req-text ~ .req-text {
+      padding: 5px 16px;
+      font: 400 12px/18px Roboto;
+      background: var(--md-surface-container);
+      color: var(--md-on-surface-variant);
+      gap: 8px;
+    }
+    .req-text ~ .req-text::before {
+      content: '›';
+      color: var(--md-primary);
+      font-size: 15px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* ── Task Result (Paper) ── */
+    .task-result-wrap {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 16px;
+    }
+    .task-result-paper {
+      background: var(--md-surface-container-lowest);
+      border-radius: var(--md-shape-lg);
+      box-shadow: none;
+      border: 1px solid var(--md-outline-variant);
+      overflow: hidden;
+    }
+    .task-result-header {
+      background: var(--md-secondary-container);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .task-result-header h2 {
+      font: 500 15px/22px Roboto;
+      color: var(--md-on-secondary-container);
+      letter-spacing: 0.15px;
+      margin: 0;
+    }
+
+    /* ── Task Thoughts ── */
+    .task-result-thoughts {
+      max-width: 960px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+    }
+    .thoughts-card { padding: 0; overflow: hidden; border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-md); }
+    .thoughts-header {
+      background: var(--md-secondary-container);
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .thoughts-header h2 {
+      font: 500 15px/22px Roboto;
+      color: var(--md-on-secondary-container);
+      letter-spacing: 0.15px;
+      margin: 0;
+    }
+    .thoughts-body { padding: 28px; }
+    .thoughts-card h3 {
+      font: 400 20px/28px Roboto;
+      color: var(--md-on-surface);
+      margin-bottom: 14px;
+    }
+    .thoughts-card p {
+      font: 400 14px/22px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+      margin-bottom: 10px;
+    }
+    .thoughts-card p:last-child { margin-bottom: 0; }
+    .thoughts-thanks {
+      color: var(--md-primary) !important;
+      padding-top: 12px;
+      border-top: 1px solid var(--md-outline-variant);
+      margin-top: 6px;
+      font-weight: 500 !important;
+    }
+
+    /* ── Home Button ── */
+    .home-btn-wrap {
+      max-width: 960px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--md-surface-container-highest);
+      border-top: 1px solid var(--md-outline-variant);
+      padding: 18px 24px;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      font: 400 12px/16px Roboto;
+      letter-spacing: 0.4px;
+      color: var(--md-on-surface-variant);
+    }
+    .footer-github-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--md-surface-container-high);
+      color: var(--md-on-surface);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-sm);
+      padding: 6px 14px;
+      font: 500 12px/16px Roboto;
+      text-decoration: none;
+    }
+    .footer-github-btn:hover {
+      background: var(--md-primary-container);
+    }
+    .footer-github-btn svg {
+      width: 16px; height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top App Bar -->
+<header class="m3-top-bar">
+  <div class="m3-top-bar-left">
+    <button class="m3-icon-btn" onclick="location.href='index.html'" title="뒤로가기">←</button>
+  </div>
+  <span class="m3-top-bar-title">Task 2 — CSS Grid 사진 격자</span>
+  <div class="m3-top-bar-right">
+    <button class="m3-icon-btn" onclick="takeScreenshot(this, 'task2-css-grid.png')" title="스크린샷 저장">📷</button>
+    <button class="m3-icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <span class="eyebrow">Task 2</span>
+  <h1>사진 <strong>격자 레이아웃</strong></h1>
+  <div class="req-card">
+    <span class="req-label">요구사항</span>
+    <span class="req-text">CSS Grid를 사용해 3x3 사진 격자를 만듭니다. 각 사진은 임의의 이미지로 채우며, 사진 간 간격을 CSS로 조정해 줍니다. 결과물로 제작한 사진 격자의 스크린샷을 제출합니다.</span>
+    <span class="req-text">CSS Grid로 3x3 격자 구현</span>
+    <span class="req-text">사진 간 간격(gap) 조정</span>
+    <span class="req-text">각 사진은 정사각형으로 유지</span>
+  </div>
+  <a href="#task-result" class="m3-btn-filled" style="display:inline-block;margin-top:8px;">CSS 격자 레이아웃 확인하기 ↓</a>
+</section>
+
+<!-- Task Result Section -->
+<section id="task-result">
+  <div class="task-result-wrap">
+    <div class="task-result-paper">
+      <div class="task-result-header">
+        <h2>📄 Task 2 결과물 — CSS Grid 3×3 사진 격자</h2>
+      </div>
+
+      <div class="page-wrap">
+
+        <div class="demo-container">
+          <div class="demo-tabs">
+            <button class="demo-tab active" data-tab="result-panel">결과</button>
+            <button class="demo-tab" data-tab="code-panel">코드</button>
+          </div>
+          <div class="demo-content">
+            <div class="demo-panel active" id="result-panel">
+              <div class="photo-grid">
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/forest/400/400" alt="숲" />
+                  <div class="photo-num">01</div>
+                  <div class="photo-scrim"><span class="photo-label">🌲 숲</span></div>
+                </div>
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/ocean/400/400" alt="바다" />
+                  <div class="photo-num">02</div>
+                  <div class="photo-scrim"><span class="photo-label">🌊 바다</span></div>
+                </div>
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/mountain/400/400" alt="산" />
+                  <div class="photo-num">03</div>
+                  <div class="photo-scrim"><span class="photo-label">⛰️ 산</span></div>
+                </div>
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/city/400/400" alt="도시" />
+                  <div class="photo-num">04</div>
+                  <div class="photo-scrim"><span class="photo-label">🏙️ 도시</span></div>
+                </div>
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/flower/400/400" alt="꽃" />
+                  <div class="photo-num">05</div>
+                  <div class="photo-scrim"><span class="photo-label">🌸 꽃</span></div>
+                </div>
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/sunset/400/400" alt="노을" />
+                  <div class="photo-num">06</div>
+                  <div class="photo-scrim"><span class="photo-label">🌅 노을</span></div>
+                </div>
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/lake/400/400" alt="호수" />
+                  <div class="photo-num">07</div>
+                  <div class="photo-scrim"><span class="photo-label">🏞️ 호수</span></div>
+                </div>
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/desert/400/400" alt="사막" />
+                  <div class="photo-num">08</div>
+                  <div class="photo-scrim"><span class="photo-label">🏜️ 사막</span></div>
+                </div>
+                <div class="photo-card">
+                  <img src="https://picsum.photos/seed/snow/400/400" alt="설원" />
+                  <div class="photo-num">09</div>
+                  <div class="photo-scrim"><span class="photo-label">❄️ 설원</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="demo-panel" id="code-panel">
+              <h3>핵심 CSS Grid 코드</h3>
+              <div class="m3-code"><pre><code><span class="cmt">/* 그리드 컨테이너 */</span>
+<span class="prop">.photo-grid</span> {
+  <span class="kw">display</span>: <span class="val">grid</span>;
+  <span class="kw">grid-template-columns</span>: <span class="val">repeat</span>(<span class="num">3</span>, <span class="num">1</span>fr);
+  <span class="kw">grid-template-rows</span>:    <span class="val">repeat</span>(<span class="num">3</span>, <span class="num">1</span>fr);
+  <span class="kw">gap</span>: <span class="num">10</span>px; <span class="cmt">/* 사진 간 간격 */</span>
+}
+
+<span class="prop">.photo-card</span> {
+  <span class="kw">aspect-ratio</span>: <span class="num">1</span> / <span class="num">1</span>;     <span class="cmt">/* 정사각형 유지 */</span>
+  <span class="kw">overflow</span>: <span class="val">hidden</span>;
+  <span class="kw">border-radius</span>: <span class="num">12</span>px;   <span class="cmt">/* M3 Medium Shape */</span>
+}
+
+<span class="prop">.photo-card img</span> {
+  <span class="kw">width</span>: <span class="num">100</span>%; <span class="kw">height</span>: <span class="num">100</span>%;
+  <span class="kw">object-fit</span>: <span class="val">cover</span>;      <span class="cmt">/* 비율 유지하며 채움 */</span>
+}
+</code></pre></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Task Result Thoughts -->
+<section class="task-result-thoughts">
+  <div class="m3-card thoughts-card">
+    <div class="thoughts-header">
+      <h2>💬 과제 소감</h2>
+    </div>
+    <div class="thoughts-body">
+      <h3>Task 2를 마치며</h3>
+      <p>
+        <strong>CSS Grid</strong>의 <code>repeat(3, 1fr)</code> 단 한 줄로 완벽한 3×3 격자를 만들 수 있다는 것이 놀라웠습니다.
+        이전에는 float이나 inline-block으로 격자를 구현하면서 복잡한 계산이 필요했는데, Grid를 사용하면 훨씬 직관적입니다.
+      </p>
+      <p>
+        <strong>aspect-ratio: 1 / 1</strong> 속성으로 이미지를 항상 정사각형으로 유지하는 방법도 새롭게 배웠습니다.
+        hover 시 scrim(반투명 오버레이)으로 사진 설명을 보여주는 인터랙션을 추가하면서 시각적 완성도도 높일 수 있었습니다.
+      </p>
+      <p class="thoughts-thanks">
+        🙏 감사합니다 🙏
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Home Button -->
+<div class="home-btn-wrap">
+  <a href="index.html" class="m3-btn-outlined">← 홈으로 돌아가기</a>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-copy">© 2025 sooohaaan</span>
+    <a href="https://github.com/sooohaaan" target="_blank" rel="noopener noreferrer" class="footer-github-btn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      GitHub
+    </a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="global.js" defer></script>
+</body>
+</html>

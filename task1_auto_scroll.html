@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task 1 — 마우스 스크롤 자동화</title>
+  <link rel="stylesheet" href="m3-tokens.css" />
+  <style>
+    :root {
+      /* Mono tone overrides */
+      --md-primary: #424242;
+      --md-on-primary: #ffffff;
+      --md-primary-container: #e0e0e0;
+      --md-on-primary-container: #1a1a1a;
+      --md-secondary-container: #f5f5f5;
+      --md-on-secondary-container: #1a1a1a;
+      --md-tertiary-container: #eeeeee;
+      --md-on-tertiary-container: #1a1a1a;
+      --md-surface-container: #f0f0f0;
+      --md-surface-container-low: #f8f8f8;
+      --md-surface-container-lowest: #ffffff;
+      --md-surface-container-high: #ececec;
+      --md-surface-container-highest: #e6e6e6;
+      --md-on-surface: #1a1a1a;
+      --md-on-surface-variant: #424242;
+      --md-outline: #757575;
+      --md-outline-variant: #bfc7cd;
+      --md-elev-1: none;
+      --md-elev-2: none;
+      --md-elev-3: none;
+    }
+
+    /* Header override */
+    .m3-top-bar {
+      height: 56px;
+    }
+    .m3-top-bar-title {
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    /* Smooth theme transition */
+    html[data-theme] *,
+    html[data-theme] *::before,
+    html[data-theme] *::after {
+      transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        fill 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease,
+        opacity 0.25s ease,
+        width 0.25s ease,
+        filter 0.25s ease;
+    }
+
+    /* ── Fixed Top App Bar ── */
+    .m3-top-bar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+    }
+
+    /* ── Controls bar — sticky below header on scroll ── */
+    .controls-bar {
+      position: sticky;
+      top: 56px;
+      height: 52px;
+      background: var(--md-surface-container-low);
+      border-bottom: 1px solid var(--md-outline-variant);
+      padding: 0 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      z-index: 99;
+    }
+
+    .speed-info {
+      font: 500 12px/16px Roboto;
+      letter-spacing: 0.5px;
+      color: var(--md-on-surface-variant);
+      min-width: 56px;
+    }
+
+    input[type="range"] {
+      width: 96px;
+      accent-color: var(--md-primary);
+    }
+
+    /* Status chip */
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      height: 28px;
+      padding: 0 12px;
+      border-radius: var(--md-shape-sm);
+      border: 1px solid var(--md-outline-variant);
+      background: var(--md-surface-container-low);
+      color: var(--md-on-surface-variant);
+      font: 500 12px/28px Roboto;
+      letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .status-chip.running {
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+      border-color: transparent;
+    }
+    .status-chip.done {
+      background: var(--md-primary-container);
+      color: var(--md-on-primary-container);
+      border-color: transparent;
+    }
+
+    /* Hero offset (header 56px) */
+    .hero-task1 {
+      margin-top: 56px;
+    }
+
+    /* Content */
+    .content {
+      max-width: 760px;
+      margin: 0 auto;
+      padding: 28px 16px 48px;
+    }
+
+    /* Section cards */
+    .section-card {
+      padding: 28px;
+      margin-bottom: 10px;
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-md);
+    }
+
+    .card-eyebrow {
+      font: 500 11px/16px Roboto;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--md-primary);
+      margin-bottom: 10px;
+    }
+
+    .section-card h3 {
+      font: 400 22px/28px Roboto;
+      color: var(--md-on-surface);
+      margin-bottom: 12px;
+    }
+
+    .section-card p {
+      font: 400 14px/22px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+      margin-bottom: 8px;
+    }
+    .section-card p:last-child { margin-bottom: 0; }
+
+    /* Bottom section */
+    .page-end {
+      background: var(--md-primary-container);
+      border-radius: var(--md-shape-xl);
+      padding: 56px 32px;
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .page-end h2 {
+      font: 400 28px/36px Roboto;
+      color: var(--md-on-primary-container);
+      margin-bottom: 12px;
+    }
+
+    .page-end p {
+      font: 400 14px/20px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+    }
+
+    /* Requirement card */
+    .req-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--md-shape-md);
+      border: 1px solid var(--md-outline-variant);
+      overflow: hidden;
+      margin: 0 auto 20px;
+      text-align: left;
+      max-width: 560px;
+      width: 100%;
+    }
+    .req-label {
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+      padding: 10px 16px;
+      font: 500 12px/16px Roboto;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .req-text {
+      background: var(--md-surface-container-lowest);
+      color: var(--md-on-surface);
+      padding: 8px 16px;
+      font: 400 13px/20px Roboto;
+      letter-spacing: 0.25px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .req-text:last-child { border-bottom: none; }
+    /* 첫 번째 req-text = 요구사항 설명 */
+    .req-label + .req-text {
+      font: 400 13px/22px Roboto;
+      padding: 12px 16px;
+      color: var(--md-on-surface);
+    }
+    /* 이후 req-text = 구현 방식 목록 */
+    .req-text ~ .req-text {
+      padding: 5px 16px;
+      font: 400 12px/18px Roboto;
+      color: var(--md-on-surface-variant);
+      background: var(--md-surface-container);
+      gap: 8px;
+    }
+    .req-text ~ .req-text::before {
+      content: '›';
+      color: var(--md-primary);
+      font-size: 15px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* ── Task Result (Paper) ── */
+    .task-result-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 16px;
+    }
+    .task-result-paper {
+      background: var(--md-surface-container-lowest);
+      border-radius: var(--md-shape-lg);
+      box-shadow: none;
+      border: 1px solid var(--md-outline-variant);
+      overflow: hidden;
+    }
+    .task-result-header {
+      background: var(--md-secondary-container);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .task-result-header h2 {
+      font: 500 15px/22px Roboto;
+      color: var(--md-on-secondary-container);
+      letter-spacing: 0.15px;
+      margin: 0;
+    }
+
+    /* ── Task Thoughts ── */
+    .task-result-thoughts {
+      max-width: 900px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+    }
+    .thoughts-card { padding: 0; overflow: hidden; border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-md); }
+    .thoughts-header {
+      background: var(--md-secondary-container);
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .thoughts-header h2 {
+      font: 500 15px/22px Roboto;
+      color: var(--md-on-secondary-container);
+      letter-spacing: 0.15px;
+      margin: 0;
+    }
+    .thoughts-body { padding: 28px; }
+    .thoughts-card h3 {
+      font: 400 20px/28px Roboto;
+      color: var(--md-on-surface);
+      margin-bottom: 14px;
+    }
+    .thoughts-card p {
+      font: 400 14px/22px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+      margin-bottom: 10px;
+    }
+    .thoughts-card p:last-child { margin-bottom: 0; }
+    .thoughts-thanks {
+      color: var(--md-primary) !important;
+      padding-top: 12px;
+      border-top: 1px solid var(--md-outline-variant);
+      margin-top: 6px;
+      font-weight: 500 !important;
+    }
+
+    /* ── Home Button ── */
+    .home-btn-wrap {
+      max-width: 900px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--md-surface-container-highest);
+      border-top: 1px solid var(--md-outline-variant);
+      padding: 18px 24px;
+    }
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      font: 400 12px/16px Roboto;
+      letter-spacing: 0.4px;
+      color: var(--md-on-surface-variant);
+    }
+    .footer-github-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--md-surface-container-high);
+      color: var(--md-on-surface);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-sm);
+      padding: 6px 14px;
+      font: 500 12px/16px Roboto;
+      text-decoration: none;
+    }
+    .footer-github-btn:hover {
+      background: var(--md-primary-container);
+    }
+    .footer-github-btn svg {
+      width: 16px; height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top App Bar -->
+<header class="m3-top-bar">
+  <div class="m3-top-bar-left">
+    <button class="m3-icon-btn" onclick="location.href='index.html'" title="뒤로가기">←</button>
+  </div>
+  <span class="m3-top-bar-title">Task 1 — 자동 스크롤</span>
+  <div class="m3-top-bar-right">
+    <button class="m3-icon-btn" onclick="takeScreenshot(this, 'task1-auto-scroll.png')" title="스크린샷 저장">📷</button>
+    <button class="m3-icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero hero-task1">
+  <span class="eyebrow">Task 1</span>
+  <h1>JavaScript를 이용한<br><strong>자동 스크롤 구현</strong></h1>
+  <div class="req-card">
+    <span class="req-label">요구사항</span>
+    <span class="req-text">자바스크립트를 이용해  마우스 스크롤을 자동으로 가장 마지막 페이지까지 내리도록 하고 코드와 스크린샷을 제출합니다.</span>
+    <span class="req-text">requestAnimationFrame 기반으로 구현</span>
+    <span class="req-text">스크롤 속도 제어 기능 포함</span>
+    <span class="req-text">스크롤 진행률 표시</span>
+  </div>
+  <a href="#task-result" class="m3-btn-filled" style="display:inline-block;margin-top:8px;">자동 스크롤 확인하기 ↓</a>
+</section>
+
+<!-- Controls bar — sticky below header when scrolled -->
+<div class="controls-bar">
+  <span class="speed-info" id="speedLabel">5 px/f</span>
+  <input type="range" id="speedSlider" min="1" max="20" value="5"
+         oninput="updateSpeed(this.value)" />
+  <button class="m3-btn-filled"   onclick="startScroll()">시작</button>
+  <button class="m3-btn-outlined" onclick="stopScroll()">정지</button>
+  <button class="m3-btn-text"     onclick="resetScroll()">초기화</button>
+  <span class="status-chip" id="statusChip">대기중</span>
+</div>
+
+<!-- Task Result Section -->
+<section id="task-result">
+  <div class="task-result-wrap">
+    <div class="task-result-paper">
+      <div class="task-result-header">
+        <h2>📄 Task 1 결과물 — requestAnimationFrame 자동 스크롤</h2>
+      </div>
+      <div class="content">
+
+        <div class="m3-card section-card">
+          <p class="card-eyebrow">개요</p>
+          <h3>JavaScript 자동 스크롤이란?</h3>
+          <p><code>window.scrollBy()</code>와 <code>requestAnimationFrame()</code>을 결합하면 부드럽고 제어 가능한 자동 스크롤을 구현할 수 있습니다.</p>
+          <p>매 프레임마다 일정 픽셀씩 스크롤하고, 페이지 맨 아래에 도달하면 자동으로 멈춥니다.</p>
+          <div class="m3-code"><pre><code><span class="kw">let</span> scrollId = <span class="kw">null</span>;
+<span class="kw">let</span> speed = <span class="num">5</span>;
+
+<span class="kw">function</span> <span class="fn">autoScroll</span>() {
+  <span class="kw">const</span> maxScroll =
+    document.body.scrollHeight - window.innerHeight;
+  <span class="kw">if</span> (window.scrollY &gt;= maxScroll) {
+    <span class="fn">stopScroll</span>(); <span class="kw">return</span>;
+  }
+  window.<span class="fn">scrollBy</span>(<span class="num">0</span>, speed);
+  scrollId = window.<span class="fn">requestAnimationFrame</span>(autoScroll);
+}
+</code></pre></div>
+        </div>
+
+        <div class="m3-card section-card">
+          <p class="card-eyebrow">핵심 API</p>
+          <h3>사용된 주요 Web API</h3>
+          <p><strong>window.scrollBy(x, y)</strong> — 현재 위치 기준 상대적으로 스크롤</p>
+          <p><strong>requestAnimationFrame(cb)</strong> — 60fps 렌더링 주기에 맞춰 콜백 반복 호출</p>
+          <p><strong>cancelAnimationFrame(id)</strong> — 예약된 프레임 콜백 취소</p>
+          <p><strong>document.body.scrollHeight</strong> — 페이지 전체 높이</p>
+          <p><strong>window.scrollY</strong> — 현재 스크롤 위치</p>
+        </div>
+
+        <div class="m3-card section-card">
+          <p class="card-eyebrow">성능</p>
+          <h3>requestAnimationFrame vs setInterval</h3>
+          <p><code>setInterval</code>은 백그라운드 탭에서도 계속 실행되어 CPU를 낭비합니다.</p>
+          <p><code>requestAnimationFrame</code>은 탭이 숨겨지면 자동 일시정지되고 VSync에 맞춰 더 부드러운 애니메이션을 보장합니다.</p>
+        </div>
+
+        <div class="m3-card section-card">
+          <p class="card-eyebrow">이벤트</p>
+          <h3>사용자 휠 감지 → 정지</h3>
+          <div class="m3-code"><pre><code>window.<span class="fn">addEventListener</span>(<span class="str">'wheel'</span>, () =&gt; {
+  <span class="kw">if</span> (scrollId) <span class="fn">stopScroll</span>();
+});
+</code></pre></div>
+        </div>
+
+        <div class="m3-card section-card">
+          <p class="card-eyebrow">진행률</p>
+          <h3>스크롤 진행률 계산</h3>
+          <div class="m3-code"><pre><code>window.<span class="fn">addEventListener</span>(<span class="str">'scroll'</span>, () =&gt; {
+  <span class="kw">const</span> pct =
+    (window.scrollY /
+    (document.body.scrollHeight - window.innerHeight))
+    * <span class="num">100</span>;
+  progressBar.style.width = pct + <span class="str">'%'</span>;
+});
+</code></pre></div>
+        </div>
+
+        <div class="m3-card section-card">
+          <p class="card-eyebrow">속도 제어</p>
+          <h3>슬라이더로 실시간 조절</h3>
+          <p>슬라이더 값을 <code>speed</code> 변수에 실시간 반영하여 <code>scrollBy</code>의 이동량을 동적으로 변경합니다.</p>
+          <div class="m3-code"><pre><code>&lt;<span class="kw">input</span> type=<span class="str">"range"</span> min=<span class="str">"1"</span> max=<span class="str">"20"</span>
+  oninput=<span class="str">"speed = +this.value"</span> /&gt;
+</code></pre></div>
+        </div>
+
+        <div class="m3-card section-card">
+          <p class="card-eyebrow">활용</p>
+          <h3>자동 스크롤 사용 사례</h3>
+          <p>• 뉴스·블로그 자동 읽기 모드</p>
+          <p>• 랜딩 페이지 자동 시연</p>
+          <p>• Puppeteer / Playwright E2E 테스트</p>
+          <p>• 접근성 — 신체적 제약이 있는 사용자 지원</p>
+        </div>
+
+        <!-- 페이지 끝 -->
+        <div class="page-end" id="page-bottom">
+          <h2>🎉 페이지 맨 아래!</h2>
+          <p>자동 스크롤이 이 지점에 도달하면 자동으로 멈춥니다.</p>
+          <br>
+          <span class="m3-chip m3-chip-filled">✅ Task 1 완료</span>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Task Result Thoughts -->
+<section class="task-result-thoughts">
+  <div class="m3-card thoughts-card">
+    <div class="thoughts-header">
+      <h2>💬 과제 소감</h2>
+    </div>
+    <div class="thoughts-body">
+      <h3>Task 1을 마치며</h3>
+      <p>
+        이번 Task에서 <strong>requestAnimationFrame</strong>을 직접 활용하면서, setInterval과의 차이를 코드로 체감할 수 있었습니다.
+        브라우저의 렌더링 주기(VSync)에 맞춰 동작하기 때문에 훨씬 부드럽고, 탭이 숨겨지면 자동으로 일시정지된다는 점이 인상적이었습니다.
+      </p>
+      <p>
+        속도 슬라이더와 진행률 바를 함께 구현하면서 <strong>사용자 인터랙션의 중요성</strong>도 새삼 느꼈습니다.
+        단순히 스크롤을 자동화하는 것에서 그치지 않고, 사용자가 제어권을 가질 수 있도록 설계하는 것이 좋은 UX임을 배웠습니다.
+      </p>
+      <p class="thoughts-thanks">
+        🙏 감사합니다 🙏
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Home Button -->
+<div class="home-btn-wrap">
+  <a href="index.html" class="m3-btn-outlined">← 홈으로 돌아가기</a>
+</div>
+
+<!-- Snackbar -->
+<div class="m3-snackbar" id="snackbar"></div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-copy">© 2025 sooohaaan</span>
+    <a href="https://github.com/sooohaaan" target="_blank" rel="noopener noreferrer" class="footer-github-btn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      GitHub
+    </a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="global.js" defer></script>
+<script>
+  // This page-specific script runs after global.js
+  // It relies on `showSnack` from global.js
+  let scrollId = null;
+  let speed = 5;
+
+  function updateSpeed(val) {
+    speed = Number(val);
+    document.getElementById('speedLabel').textContent = val + ' px/f';
+  }
+
+  function startScroll() {
+    if (scrollId) return;
+    // 스크롤이 이미 맨 아래에 도달했는지 확인
+    if (window.scrollY >= document.body.scrollHeight - window.innerHeight - 2) {
+      showSnack('이미 페이지 끝입니다. 초기화 후 다시 시작하세요.');
+      return;
+    }
+    setChip('스크롤 중', 'running');
+    scrollId = requestAnimationFrame(autoScroll);
+  }
+
+  function stopScroll() {
+    cancelAnimationFrame(scrollId);
+    scrollId = null;
+    const atBottom = window.scrollY >= document.body.scrollHeight - window.innerHeight - 5;
+    if (!atBottom) setChip('정지됨', '');
+  }
+
+  function resetScroll() {
+    stopScroll();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setChip('대기중', '');
+  }
+
+  function autoScroll() {
+    if (window.scrollY >= document.body.scrollHeight - window.innerHeight - 2) {
+      stopScroll();
+      setChip('완료 ✅', 'done');
+      showSnack('✅ 페이지 끝에 도달했습니다!');
+      return;
+    }
+    window.scrollBy(0, speed);
+    scrollId = requestAnimationFrame(autoScroll);
+  }
+
+  // 사용자가 직접 휠을 조작하면 자동 스크롤 중지
+  window.addEventListener('wheel', () => {
+    if (scrollId) {
+      cancelAnimationFrame(scrollId);
+      scrollId = null;
+      setChip('사용자 중단', '');
+    }
+  }, { passive: true });
+
+  function setChip(txt, mod) {
+    const c = document.getElementById('statusChip');
+    c.textContent = txt;
+    c.className = 'status-chip' + (mod ? ' ' + mod : '');
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task 4 — CSS 웹 페이지 스타일링</title>
+  <link rel="stylesheet" href="m3-tokens.css" />
+  <style>
+    :root {
+      /* Mono tone overrides */
+      --md-primary: #424242;
+      --md-on-primary: #ffffff;
+      --md-primary-container: #e0e0e0;
+      --md-on-primary-container: #1a1a1a;
+      --md-secondary-container: #f5f5f5;
+      --md-on-secondary-container: #1a1a1a;
+      --md-tertiary-container: #eeeeee;
+      --md-on-tertiary-container: #1a1a1a;
+      --md-surface-container: #f0f0f0;
+      --md-surface-container-low: #f8f8f8;
+      --md-surface-container-lowest: #ffffff;
+      --md-surface-container-high: #ececec;
+      --md-surface-container-highest: #e6e6e6;
+      --md-on-surface: #1a1a1a;
+      --md-on-surface-variant: #424242;
+      --md-outline: #757575;
+      --md-outline-variant: #bfc7cd;
+      --md-elev-1: none;
+      --md-elev-2: none;
+      --md-elev-3: none;
+    }
+
+    /* Header override */
+    .m3-top-bar {
+      height: 56px;
+    }
+    .m3-top-bar-title {
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    /* Smooth theme transition */
+    html[data-theme] *,
+    html[data-theme] *::before,
+    html[data-theme] *::after {
+      transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        fill 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease,
+        opacity 0.25s ease,
+        width 0.25s ease,
+        filter 0.25s ease;
+    }
+
+    /* Wrapper */
+    .wrapper {
+      max-width: 1040px;
+      margin: 0 auto;
+      padding: 32px 24px 40px;
+    }
+
+    /* Sec header */
+    .sec {
+      margin-bottom: 32px;
+    }
+
+    .sec-eyebrow {
+      font: 500 11px/16px Roboto;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--md-primary);
+      margin-bottom: 6px;
+    }
+
+    .sec h2 {
+      font: 400 24px/32px Roboto;
+      color: var(--md-on-surface);
+      margin-bottom: 4px;
+    }
+
+    .sec p {
+      font: 400 14px/20px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+    }
+
+    /* Color palette */
+    .palette-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .swatch {
+      border-radius: var(--md-shape-md);
+      overflow: hidden;
+      box-shadow: none;
+      border: 1px solid var(--md-outline-variant);
+    }
+
+    .swatch-color { height: 60px; }
+
+    .swatch-info {
+      background: var(--md-surface-container-lowest);
+      padding: 8px 10px;
+    }
+
+    .swatch-info strong {
+      display: block;
+      font: 500 11px/16px Roboto;
+      letter-spacing: 0.5px;
+      color: var(--md-on-surface);
+    }
+
+    .swatch-info code {
+      font: 400 10px/14px 'Roboto Mono', monospace;
+      color: var(--md-on-surface-variant);
+      cursor: pointer;
+    }
+
+    /* Typography card */
+    .typo-card {
+      padding: 32px;
+      margin-top: 16px;
+      box-shadow: none;
+      border: 1px solid var(--md-outline-variant);
+    }
+    .typo-card:hover { box-shadow: none; }
+
+    .typo-card > * + * { margin-top: 10px; }
+
+    .t-display  { font: 300 36px/44px Roboto;   color: var(--md-on-surface); }
+    .t-headline { font: 400 28px/36px Roboto;   color: var(--md-primary); }
+    .t-title    { font: 400 22px/28px Roboto;   color: var(--md-on-surface); }
+    .t-body     {
+      font: 400 16px/26px Roboto;
+      letter-spacing: 0.15px;
+      color: var(--md-on-surface-variant);
+      padding-top: 6px;
+    }
+    .t-label    {
+      font: 500 12px/16px Roboto;
+      letter-spacing: 0.5px;
+      color: var(--md-on-surface-variant);
+    }
+
+    /* Card grid */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 700px) { .card-grid { grid-template-columns: 1fr; } }
+
+    .feat-card {
+      padding: 24px;
+      box-shadow: none;
+      border: 1px solid var(--md-outline-variant);
+    }
+
+    .feat-icon {
+      width: 44px; height: 44px;
+      border-radius: var(--md-shape-sm);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+      margin-bottom: 14px;
+    }
+    .feat-icon-p { background: var(--md-primary-container); }
+    .feat-icon-s { background: var(--md-secondary-container); }
+    .feat-icon-t { background: var(--md-tertiary-container); }
+
+    .feat-card h3 {
+      font: 500 16px/24px Roboto;
+      letter-spacing: 0.15px;
+      color: var(--md-on-surface);
+      margin-bottom: 6px;
+    }
+
+    .feat-card p {
+      font: 400 14px/20px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+    }
+
+    /* Table */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--md-shape-md);
+      box-shadow: none;
+      margin-top: 16px;
+      border: 1px solid var(--md-outline-variant);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font: 400 14px/20px Roboto;
+    }
+
+    thead {
+      background: var(--md-secondary-container);
+    }
+
+    thead th {
+      padding: 14px 16px;
+      text-align: left;
+      font: 500 12px/16px Roboto;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--md-on-secondary-container);
+    }
+
+    tbody tr {
+      background: var(--md-surface-container-lowest);
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+
+    tbody tr:hover { background: var(--md-surface-container-low); }
+
+    tbody td {
+      padding: 12px 16px;
+      color: var(--md-on-surface);
+      letter-spacing: 0.25px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 10px;
+      border-radius: var(--md-shape-sm);
+      font: 500 11px/16px Roboto;
+      letter-spacing: 0.5px;
+    }
+    .tag-p { background: var(--md-primary-container);   color: var(--md-on-primary-container); }
+    .tag-s { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+    .tag-t { background: var(--md-tertiary-container);  color: var(--md-on-tertiary-container); }
+
+    /* Requirement card */
+    .req-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--md-shape-md);
+      border: 1px solid var(--md-outline-variant);
+      overflow: hidden;
+      margin: 0 auto 20px;
+      text-align: left;
+      max-width: 560px;
+      width: 100%;
+    }
+    .req-label {
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+      padding: 10px 16px;
+      font: 500 12px/16px Roboto;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .req-text {
+      background: var(--md-surface-container-lowest);
+      color: var(--md-on-surface);
+      padding: 8px 16px;
+      font: 400 13px/20px Roboto;
+      letter-spacing: 0.25px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .req-text:last-child { border-bottom: none; }
+    /* 첫 번째 req-text = 요구사항 설명 */
+    .req-label + .req-text {
+      font: 400 13px/22px Roboto;
+      padding: 12px 16px;
+      color: var(--md-on-surface);
+    }
+    /* 이후 req-text = 구현 방식 목록 */
+    .req-text ~ .req-text {
+      padding: 5px 16px;
+      font: 400 12px/18px Roboto;
+      color: var(--md-on-surface-variant);
+      background: var(--md-surface-container);
+      gap: 8px;
+    }
+    .req-text ~ .req-text::before {
+      content: '›';
+      color: var(--md-primary);
+      font-size: 15px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* ── Task Result (Paper) ── */
+    .task-result-wrap {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 24px 16px 16px;
+    }
+    .task-result-paper {
+      background: var(--md-surface-container-lowest);
+      border-radius: var(--md-shape-lg);
+      box-shadow: none;
+      border: 1px solid var(--md-outline-variant);
+      overflow: hidden;
+    }
+    .task-result-header {
+      background: var(--md-secondary-container);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .task-result-header h2 {
+      font: 500 15px/22px Roboto;
+      color: var(--md-on-secondary-container);
+      letter-spacing: 0.15px;
+      margin: 0;
+    }
+
+    /* ── Task Thoughts ── */
+    .task-result-thoughts {
+      max-width: 1100px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+    }
+    .thoughts-card { padding: 0; overflow: hidden; border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-md); }
+    .thoughts-header {
+      background: var(--md-secondary-container);
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .thoughts-header h2 {
+      font: 500 15px/22px Roboto;
+      color: var(--md-on-secondary-container);
+      letter-spacing: 0.15px;
+      margin: 0;
+    }
+    .thoughts-body { padding: 28px; }
+    .thoughts-card h3 {
+      font: 400 20px/28px Roboto;
+      color: var(--md-on-surface);
+      margin-bottom: 14px;
+    }
+    .thoughts-card p {
+      font: 400 14px/22px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+      margin-bottom: 10px;
+    }
+    .thoughts-card p:last-child { margin-bottom: 0; }
+    .thoughts-thanks {
+      color: var(--md-primary) !important;
+      padding-top: 12px;
+      border-top: 1px solid var(--md-outline-variant);
+      margin-top: 6px;
+      font-weight: 500 !important;
+    }
+
+    /* ── Home Button ── */
+    .home-btn-wrap {
+      max-width: 1100px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--md-surface-container-highest);
+      border-top: 1px solid var(--md-outline-variant);
+      padding: 18px 24px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      font: 400 12px/16px Roboto;
+      letter-spacing: 0.4px;
+      color: var(--md-on-surface-variant);
+    }
+    .footer-github-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--md-surface-container-high);
+      color: var(--md-on-surface);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-sm);
+      padding: 6px 14px;
+      font: 500 12px/16px Roboto;
+      text-decoration: none;
+    }
+    .footer-github-btn:hover {
+      background: var(--md-primary-container);
+    }
+    .footer-github-btn svg {
+      width: 16px; height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<header class="m3-top-bar">
+  <div class="m3-top-bar-left">
+    <button class="m3-icon-btn" onclick="location.href='index.html'" title="뒤로가기">←</button>
+  </div>
+  <span class="m3-top-bar-title">Task 4 — CSS 스타일링</span>
+  <div class="m3-top-bar-right">
+    <button class="m3-icon-btn" onclick="takeScreenshot(this, 'task4-css-styling.png')" title="스크린샷 저장">📷</button>
+    <button class="m3-icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <span class="eyebrow">Task 4</span>
+  <h1>CSS로 완성하는<br><strong>웹 페이지 스타일링</strong></h1>
+  <div class="req-card">
+    <span class="req-label">요구사항</span>
+    <span class="req-text">HTML로 작성된 웹 페이지에 CSS를 적용하여 스타일을 지정합니다. 글자 크기, 색상, 배경색, 레이아웃 등의 스타일을 변경합니다. 결과물로 CSS를 적용하여 스타일이 변경된 웹 페이지의 스크린샷을 제출합니다.</span>
+    <span class="req-text">글자 크기, 색상, 배경색, 레이아웃 스타일링</span>
+    <span class="req-text">M3 디자인 토큰 활용</span>
+    <span class="req-text">반응형 레이아웃 적용</span>
+    <span class="req-text">호버 효과 등 인터랙션 스타일링</span>
+  </div>
+  <a href="#task-result" class="m3-btn-filled">스타일 확인하기 ↓</a>
+</section>
+
+<!-- Task Result Section -->
+<section id="task-result">
+  <div class="task-result-wrap">
+    <div class="task-result-paper">
+      <div class="task-result-header">
+        <h2>📄 Task 4 결과물 — CSS 색상·타이포그래피·레이아웃 스타일링</h2>
+      </div>
+
+      <div class="wrapper">
+
+        <!-- 색상 팔레트 -->
+        <div class="sec">
+          <p class="sec-eyebrow">Color System</p>
+          <h2>색상 팔레트</h2>
+          <p>Mono Tone Custom Theme — 그림자 제거 & 1px 테두리 스타일</p>
+        </div>
+
+        <div class="palette-grid">
+          <div class="swatch">
+            <div class="swatch-color" style="background:#424242;"></div>
+            <div class="swatch-info"><strong>Primary</strong><code>#424242</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#e0e0e0;"></div>
+            <div class="swatch-info"><strong>P. Container</strong><code>#e0e0e0</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#f5f5f5;"></div>
+            <div class="swatch-info"><strong>S. Container</strong><code>#f5f5f5</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#eeeeee;"></div>
+            <div class="swatch-info"><strong>T. Container</strong><code>#eeeeee</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#f0f0f0; outline:1px solid #BFC7CD;"></div>
+            <div class="swatch-info"><strong>Surface</strong><code>#f0f0f0</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#191C1E;"></div>
+            <div class="swatch-info"><strong>On Surface</strong><code>#191C1E</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#757575;"></div>
+            <div class="swatch-info"><strong>Outline</strong><code>#757575</code></div>
+          </div>
+          <div class="swatch">
+            <div class="swatch-color" style="background:#BA1A1A;"></div>
+            <div class="swatch-info"><strong>Error</strong><code>#BA1A1A</code></div>
+          </div>
+        </div>
+
+        <br><div class="m3-divider"></div><br>
+
+        <!-- 타이포그래피 -->
+        <div class="sec">
+          <p class="sec-eyebrow">Typography</p>
+          <h2>M3 Type Scale</h2>
+          <p>Roboto 폰트, 역할별 크기·굵기·자간 계층</p>
+        </div>
+
+        <div class="m3-card typo-card">
+          <p class="t-display">Display Small — 36px / 300</p>
+          <p class="t-headline">Headline Medium — 28px / 400</p>
+          <p class="t-title">Title Large — 22px / 400</p>
+          <p class="t-body">Body Large — 16px / 400, letter-spacing 0.15px. CSS 스타일링은 웹 페이지의 시각적 표현을 제어합니다. 폰트 크기, 색상, 배경, 여백, 테두리 등 모든 요소를 세밀하게 조정할 수 있습니다.</p>
+          <p class="t-label">Label Medium — 12px / 500, letter-spacing 0.5px</p>
+        </div>
+
+        <br><div class="m3-divider"></div><br>
+
+        <!-- 카드 -->
+        <div class="sec">
+          <p class="sec-eyebrow">Components</p>
+          <h2>카드 스타일</h2>
+          <p>Flat Card — 그림자 제거(Elevation 0) + 1px 외곽선(Border)</p>
+        </div>
+
+        <div class="card-grid">
+          <div class="m3-card feat-card">
+            <div class="feat-icon feat-icon-p">🎨</div>
+            <h3>색상 시스템</h3>
+            <p>M3 CSS 변수로 일관된 색상을 관리하면 다크/라이트 전환이 자동화됩니다.</p>
+          </div>
+          <div class="m3-card feat-card">
+            <div class="feat-icon feat-icon-s">📐</div>
+            <h3>레이아웃</h3>
+            <p>Flexbox와 Grid로 복잡한 레이아웃도 간결한 코드로 구현합니다.</p>
+          </div>
+          <div class="m3-card feat-card">
+            <div class="feat-icon feat-icon-t">✦</div>
+            <h3>인터랙션</h3>
+            <p>hover · box-shadow · transition 으로 M3 State Layer를 구현합니다.</p>
+          </div>
+        </div>
+
+        <br><div class="m3-divider"></div><br>
+
+        <!-- 테이블 -->
+        <div class="sec">
+          <p class="sec-eyebrow">Reference</p>
+          <h2>CSS 속성 표</h2>
+          <p>이 페이지에 적용된 주요 CSS 속성 정리</p>
+        </div>
+
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>속성</th><th>적용 위치</th><th>값 예시</th><th>목적</th><th>분류</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>font-size</code></td>
+                <td>body, h1~h3</td>
+                <td>16px, 36px, 12px</td>
+                <td>M3 Type Scale</td>
+                <td><span class="tag tag-p">텍스트</span></td>
+              </tr>
+              <tr>
+                <td><code>color</code></td>
+                <td>텍스트 전체</td>
+                <td>--md-on-surface</td>
+                <td>M3 색상 역할</td>
+                <td><span class="tag tag-p">텍스트</span></td>
+              </tr>
+              <tr>
+                <td><code>background</code></td>
+                <td>surface, container</td>
+                <td>--md-surface-container-low</td>
+                <td>M3 Surface 계층</td>
+                <td><span class="tag tag-s">배경</span></td>
+              </tr>
+              <tr>
+                <td><code>display: grid</code></td>
+                <td>.card-grid, .palette</td>
+                <td>repeat(3, 1fr)</td>
+                <td>3열 격자 레이아웃</td>
+                <td><span class="tag tag-t">레이아웃</span></td>
+              </tr>
+              <tr>
+                <td><code>box-shadow</code></td>
+                <td>카드, App Bar</td>
+                <td>None (제거됨)</td>
+                <td>Flat Style</td>
+                <td><span class="tag tag-s">시각</span></td>
+              </tr>
+              <tr>
+                <td><code>border</code></td>
+                <td>카드, 칩</td>
+                <td>1px solid #bfc7cd</td>
+                <td>구분선 강조</td>
+                <td><span class="tag tag-s">시각</span></td>
+              </tr>
+              <tr>
+                <td><code>border-radius</code></td>
+                <td>카드, 버튼, 칩</td>
+                <td>--md-shape-md (12px)</td>
+                <td>M3 Shape System</td>
+                <td><span class="tag tag-s">시각</span></td>
+              </tr>
+              <tr>
+                <td><code>transition</code></td>
+                <td>카드, 버튼, 테마</td>
+                <td>background 0.25s</td>
+                <td>State Layer 전환</td>
+                <td><span class="tag tag-t">애니메이션</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Task Result Thoughts -->
+<section class="task-result-thoughts">
+  <div class="m3-card thoughts-card">
+    <div class="thoughts-header">
+      <h2>💬 과제 소감</h2>
+    </div>
+    <div class="thoughts-body">
+      <h3>Task 4를 마치며</h3>
+      <p>
+        <strong>CSS 변수(Custom Properties)</strong>를 활용한 디자인 토큰 시스템의 위력을 직접 체험했습니다.
+        <code>--md-primary</code> 같은 변수 하나를 바꾸면 페이지 전체의 색상이 자동으로 변경되는 경험은
+        실제 프로젝트에서도 꼭 활용하고 싶은 패턴이라고 느꼈습니다.
+      </p>
+      <p>
+        M3 디자인 시스템의 타이포그래피 스케일, Shape 토큰, Elevation 시스템을 적용하면서
+        <strong>일관성 있는 UI</strong>가 왜 중요한지 이해했습니다. 색상, 글꼴, 여백이 규칙에 따라
+        조화를 이루면 사용자가 페이지를 더 신뢰하고 편하게 느낀다는 것을 실감했습니다.
+      </p>
+      <p class="thoughts-thanks">
+        🙏 감사합니다 🙏
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Home Button -->
+<div class="home-btn-wrap">
+  <a href="index.html" class="m3-btn-outlined">← 홈으로 돌아가기</a>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-copy">© 2025 sooohaaan</span>
+    <a href="https://github.com/sooohaaan" target="_blank" rel="noopener noreferrer" class="footer-github-btn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      GitHub
+    </a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="global.js" defer></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Color palette copy
+    document.querySelectorAll('.swatch-info code').forEach(code => {
+      code.addEventListener('click', () => {
+        const text = code.textContent;
+        navigator.clipboard.writeText(text).then(() => showSnack(`색상 코드 복사됨: ${text}`));
+      });
+    });
+  });
+</script>
+</body>
+</html>

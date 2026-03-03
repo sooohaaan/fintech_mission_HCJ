@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Task 3 — Flexbox 버튼 정렬</title>
+  <link rel="stylesheet" href="m3-tokens.css" />
+  <style>
+    :root {
+      /* Mono tone overrides */
+      --md-primary: #424242;
+      --md-on-primary: #ffffff;
+      --md-primary-container: #e0e0e0;
+      --md-on-primary-container: #1a1a1a;
+      --md-secondary-container: #f5f5f5;
+      --md-on-secondary-container: #1a1a1a;
+      --md-tertiary-container: #eeeeee;
+      --md-on-tertiary-container: #1a1a1a;
+      --md-surface-container: #f0f0f0;
+      --md-surface-container-low: #f8f8f8;
+      --md-surface-container-lowest: #ffffff;
+      --md-surface-container-high: #ececec;
+      --md-surface-container-highest: #e6e6e6;
+      --md-on-surface: #1a1a1a;
+      --md-on-surface-variant: #424242;
+      --md-outline: #757575;
+      --md-outline-variant: #bfc7cd;
+      --md-elev-1: none;
+      --md-elev-2: none;
+      --md-elev-3: none;
+    }
+
+    /* Header override */
+    .m3-top-bar {
+      height: 56px;
+    }
+    .m3-top-bar-title {
+      font-size: 18px;
+      line-height: 24px;
+    }
+
+    /* Smooth theme transition */
+    html[data-theme] *,
+    html[data-theme] *::before,
+    html[data-theme] *::after {
+      transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        fill 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease,
+        opacity 0.25s ease,
+        width 0.25s ease,
+        filter 0.25s ease;
+    }
+
+    .page {
+      padding: 40px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 20px;
+    }
+
+    /* Interactive Demo Component */
+    .demo-container {
+      width: 100%;
+      max-width: 480px;
+      border-radius: var(--md-shape-lg);
+      border: 1px solid var(--md-outline-variant);
+      background: var(--md-surface-container-lowest);
+      overflow: hidden;
+      box-shadow: var(--md-elev-1);
+    }
+    .demo-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--md-outline-variant);
+      background: var(--md-surface-container);
+    }
+    .demo-tab {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      background: transparent;
+      color: var(--md-on-surface-variant);
+      font: 500 14px/20px Roboto;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+    }
+    .demo-tab.active {
+      color: var(--md-primary);
+      border-bottom-color: var(--md-primary);
+      background: var(--md-surface-container-lowest);
+    }
+    .demo-content {
+      padding: 32px;
+    }
+    .demo-panel {
+      display: none;
+    }
+    .demo-panel.active {
+      display: block;
+      animation: m3-fade-in 0.3s;
+    }
+    .demo-panel h2 {
+      font: 400 22px/28px Roboto;
+      color: var(--md-on-surface);
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .demo-panel > p {
+      font: 400 14px/20px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+      text-align: center;
+      margin-bottom: 28px;
+    }
+    .demo-panel h3 {
+      font: 500 14px/20px Roboto;
+      letter-spacing: 0.1px;
+      color: var(--md-primary);
+      margin-bottom: 12px;
+    }
+    .btn-group {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    /* Dialog content */
+    .dialog-icon { font-size: 44px; margin-bottom: 16px; }
+    
+    /* Fixed selectors and centered text */
+    .m3-dialog { text-align: center; }
+    .m3-dialog h3 {
+      font: 400 24px/32px Roboto;
+      color: var(--md-on-surface);
+      margin-bottom: 8px;
+    }
+
+    .m3-dialog p {
+      font: 400 14px/20px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+      margin-bottom: 24px;
+    }
+
+    .dialog-actions {
+      display: flex;
+      justify-content: flex-end;
+      justify-content: center; /* Center buttons for confirmation dialog */
+    }
+
+    /* Requirement card */
+    .req-card {
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--md-shape-md);
+      border: 1px solid var(--md-outline-variant);
+      overflow: hidden;
+      margin: 0 auto 20px;
+      text-align: left;
+      max-width: 560px;
+      width: 100%;
+    }
+    .req-label {
+      background: var(--md-secondary-container);
+      color: var(--md-on-secondary-container);
+      padding: 10px 16px;
+      font: 500 12px/16px Roboto;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .req-text {
+      background: var(--md-surface-container-lowest);
+      color: var(--md-on-surface);
+      padding: 8px 16px;
+      font: 400 13px/20px Roboto;
+      letter-spacing: 0.25px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .req-text:last-child { border-bottom: none; }
+    /* 첫 번째 req-text = 요구사항 설명 */
+    .req-label + .req-text {
+      font: 400 13px/22px Roboto;
+      padding: 12px 16px;
+      color: var(--md-on-surface);
+    }
+    /* 이후 req-text = 구현 방식 목록 */
+    .req-text ~ .req-text {
+      padding: 5px 16px;
+      font: 400 12px/18px Roboto;
+      color: var(--md-on-surface-variant);
+      background: var(--md-surface-container);
+      gap: 8px;
+    }
+    .req-text ~ .req-text::before {
+      content: '›';
+      color: var(--md-primary);
+      font-size: 15px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    /* ── Task Result (Paper) ── */
+    .task-result-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 16px;
+    }
+    .task-result-paper {
+      background: var(--md-surface-container-lowest);
+      border-radius: var(--md-shape-lg);
+      box-shadow: none;
+      border: 1px solid var(--md-outline-variant);
+      overflow: hidden;
+    }
+    .task-result-header {
+      background: var(--md-secondary-container);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .task-result-header h2 {
+      font: 500 15px/22px Roboto;
+      color: var(--md-on-secondary-container);
+      letter-spacing: 0.15px;
+      margin: 0;
+    }
+
+    /* ── Task Thoughts ── */
+    .task-result-thoughts {
+      max-width: 900px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+    }
+    .thoughts-card { padding: 0; overflow: hidden; border: 1px solid var(--md-outline-variant); border-radius: var(--md-shape-md); }
+    .thoughts-header {
+      background: var(--md-secondary-container);
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--md-outline-variant);
+    }
+    .thoughts-header h2 {
+      font: 500 15px/22px Roboto;
+      color: var(--md-on-secondary-container);
+      letter-spacing: 0.15px;
+      margin: 0;
+    }
+    .thoughts-body { padding: 28px; }
+    .thoughts-card h3 {
+      font: 400 20px/28px Roboto;
+      color: var(--md-on-surface);
+      margin-bottom: 14px;
+    }
+    .thoughts-card p {
+      font: 400 14px/22px Roboto;
+      letter-spacing: 0.25px;
+      color: var(--md-on-surface-variant);
+      margin-bottom: 10px;
+    }
+    .thoughts-card p:last-child { margin-bottom: 0; }
+    .thoughts-thanks {
+      color: var(--md-primary) !important;
+      padding-top: 12px;
+      border-top: 1px solid var(--md-outline-variant);
+      margin-top: 6px;
+      font-weight: 500 !important;
+    }
+
+    /* ── Home Button ── */
+    .home-btn-wrap {
+      max-width: 900px;
+      margin: 0 auto 16px;
+      padding: 0 16px;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ── Footer ── */
+    footer {
+      background: var(--md-surface-container-highest);
+      border-top: 1px solid var(--md-outline-variant);
+      padding: 18px 24px;
+    }
+    .footer-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-copy {
+      font: 400 12px/16px Roboto;
+      letter-spacing: 0.4px;
+      color: var(--md-on-surface-variant);
+    }
+    .footer-github-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--md-surface-container-high);
+      color: var(--md-on-surface);
+      border: 1px solid var(--md-outline-variant);
+      border-radius: var(--md-shape-sm);
+      padding: 6px 14px;
+      font: 500 12px/16px Roboto;
+      text-decoration: none;
+    }
+    .footer-github-btn:hover {
+      background: var(--md-primary-container);
+    }
+    .footer-github-btn svg {
+      width: 16px; height: 16px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Top App Bar -->
+<header class="m3-top-bar">
+  <div class="m3-top-bar-left">
+    <button class="m3-icon-btn" onclick="location.href='index.html'" title="뒤로가기">←</button>
+  </div>
+  <span class="m3-top-bar-title">Task 3 — Flexbox 버튼 정렬</span>
+  <div class="m3-top-bar-right">
+    <button class="m3-icon-btn" onclick="takeScreenshot(this, 'task3-flexbox-buttons.png')" title="스크린샷 저장">📷</button>
+    <button class="m3-icon-btn" id="themeBtn" onclick="toggleTheme()">🌙</button>
+  </div>
+</header>
+
+<!-- Hero -->
+<section class="hero">
+  <span class="eyebrow">Task 3</span>
+  <h1>Flexbox<strong>로 버튼 정렬</strong></h1>
+  <div class="req-card">
+    <span class="req-label">요구사항</span>
+    <span class="req-text">Flexbox를 사용해 중앙에 정렬된 두 개의 버튼을 디자인합니다. 하나는 "확인", 다른 하나는 "취소" 버튼으로, 버튼에 배경색과 호버 효과를 적용해 봅니다. 결과물로 버튼 두개가 있는 웹 페이지의 스크린샷을 제출합니다.</span>
+    <span class="req-text">Flexbox로 버튼 중앙 정렬</span>
+    <span class="req-text">"확인"과 "취소" 버튼 디자인</span>
+    <span class="req-text">버튼에 배경색과 호버 효과 적용</span>
+  </div>
+  <a href="#task-result" class="m3-btn-filled" style="display:inline-block;margin-top:8px;">버튼 정렬 확인하기 ↓</a>
+</section>
+
+<!-- Task Result Section -->
+<section id="task-result">
+  <div class="task-result-wrap">
+    <div class="task-result-paper">
+      <div class="task-result-header">
+        <h2>📄 Task 3 결과물 — Flexbox 버튼 중앙 정렬</h2>
+      </div>
+
+      <div class="page">
+
+        <div class="demo-container">
+          <div class="demo-tabs">
+            <button class="demo-tab active" data-tab="result-panel">결과</button>
+            <button class="demo-tab" data-tab="code-panel">코드</button>
+          </div>
+          <div class="demo-content">
+            <div class="demo-panel active" id="result-panel">
+              <h2>작업을 진행하시겠습니까?</h2>
+              <p>이 작업은 되돌릴 수 없습니다. 신중하게 선택해 주세요.</p>
+              <div class="btn-group">
+                <button class="m3-btn-filled" onclick="openDialog('confirm')">확인</button>
+                <button class="m3-btn-outlined" onclick="openDialog('cancel')">취소</button>
+              </div>
+            </div>
+            <div class="demo-panel" id="code-panel">
+              <h3>핵심 Flexbox 코드</h3>
+              <div class="m3-code"><pre><code><span class="cmt">/* 버튼 컨테이너 */</span>
+<span class="prop">.btn-group</span> {
+  <span class="kw">display</span>: flex;
+  <span class="kw">justify-content</span>: center;  <span class="cmt">/* 가로 중앙 */</span>
+  <span class="kw">align-items</span>: center;
+  <span class="kw">gap</span>: <span class="num">12</span>px;
+}
+
+<span class="cmt">/* M3 Filled Button */</span>
+<span class="prop">.btn-filled</span> {
+  <span class="kw">height</span>: <span class="num">40</span>px; <span class="kw">padding</span>: <span class="num">0</span> <span class="num">24</span>px;
+  <span class="kw">border-radius</span>: <span class="num">50</span>px; <span class="cmt">/* Full shape */</span>
+  <span class="kw">background</span>: var(--md-primary);
+  <span class="kw">color</span>: var(--md-on-primary);
+}
+
+<span class="cmt">/* M3 Outlined Button */</span>
+<span class="prop">.btn-outlined</span> {
+  <span class="kw">border</span>: <span class="num">1</span>px solid var(--md-outline);
+  <span class="kw">background</span>: transparent;
+  <span class="kw">color</span>: var(--md-primary);
+}
+</code></pre></div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- M3 Dialog — 확인 -->
+<div class="m3-dialog-scrim" id="confirmScrim"
+     onclick="closeDialog('confirm')">
+  <div class="m3-dialog" onclick="event.stopPropagation()">
+    <div class="dialog-icon">✅</div>
+    <h3>확인되었습니다</h3>
+    <p>작업이 성공적으로 처리되었습니다.</p>
+    <div class="dialog-actions">
+      <button class="m3-btn-text" onclick="closeDialog('confirm')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- M3 Dialog — 취소 -->
+<div class="m3-dialog-scrim" id="cancelScrim"
+     onclick="closeDialog('cancel')">
+  <div class="m3-dialog" onclick="event.stopPropagation()">
+    <div class="dialog-icon">✕</div>
+    <h3>취소되었습니다</h3>
+    <p>작업이 취소되었습니다. 언제든 다시 시도할 수 있습니다.</p>
+    <div class="dialog-actions">
+      <button class="m3-btn-text" onclick="closeDialog('cancel')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- Task Result Thoughts -->
+<section class="task-result-thoughts">
+  <div class="m3-card thoughts-card">
+    <div class="thoughts-header">
+      <h2>💬 과제 소감</h2>
+    </div>
+    <div class="thoughts-body">
+      <h3>Task 3을 마치며</h3>
+      <p>
+        <strong>Flexbox</strong>의 <code>justify-content: center</code> 한 줄로 버튼을 완벽하게 가로 중앙 정렬할 수 있다는 것이 인상적이었습니다.
+        예전에는 <code>margin: auto</code>나 <code>position: absolute</code>로 복잡하게 처리했는데, Flexbox를 통해 훨씬 직관적이고 유지보수하기 좋은 방식을 익혔습니다.
+      </p>
+      <p>
+        확인/취소 버튼에 각각 <strong>Filled</strong>와 <strong>Outlined</strong> 스타일을 적용하면서 M3 버튼의 위계 구조도 이해할 수 있었습니다.
+        Modal Dialog를 통해 사용자의 행동에 즉각적인 피드백을 주는 UX의 중요성도 배웠습니다.
+      </p>
+      <p class="thoughts-thanks">
+        🙏 감사합니다 🙏
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Home Button -->
+<div class="home-btn-wrap">
+  <a href="index.html" class="m3-btn-outlined">← 홈으로 돌아가기</a>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <span class="footer-copy">© 2025 sooohaaan</span>
+    <a href="https://github.com/sooohaaan" target="_blank" rel="noopener noreferrer" class="footer-github-btn">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      GitHub
+    </a>
+  </div>
+</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="global.js" defer></script>
+</body>
+</html>
